@@ -139,6 +139,11 @@ public class Controller implements Initializable {
                                 });
                             }
 
+                            if (str.startsWith("/ваш ник: ")){
+                                nick = str.split(" ") [1];
+                                setTitle(nick);
+                            }
+
                         } else {
                             textArea.appendText(str + "\n");
                         }

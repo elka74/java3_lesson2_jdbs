@@ -68,6 +68,8 @@ public class ClientHandler {
                                     server.subscribe(this);
                                     System.out.println("Клиент: " + nick + " подключился"+ socket.getRemoteSocketAddress());
                                     socket.setSoTimeout(0);
+
+                                    sendMsg(DataBase.getMessageFromNick(nick));
                                     break;
                                 } else {
                                     sendMsg("С этим логином уже прошли аутентификацию");
@@ -96,6 +98,22 @@ public class ClientHandler {
 
                                 server.privateMsg(this, token[1], token[2]);
                             }
+                            if (str.startsWith("/chnick")){
+                                String [] token = str.split(" ",2);
+                                if (token.length < 2){
+                                    continue;
+                                }
+                                if (token[1].contains(" ")){
+                                    sendMsg("Ник не может содержать пробелов.");
+                                    continue;
+                                }
+                                if (server.getAuthService().changeNick(this.nick, token[1])){
+                                    sendMsg("/ваш ник: " + token[1]);
+                                    server.broadcastClientList();
+                                }else {
+                                    sendMsg("Не удалось сменить ник.");
+                                }
+                            }
                         } else {
                             server.broadcastMsg(nick, str);
                         }
@@ -103,7 +121,7 @@ public class ClientHandler {
                 }catch (SocketTimeoutException e){
                     sendMsg("/end");
                 }
-                ///////
+
                 catch (IOException e) {
                     e.printStackTrace();
                 } finally {

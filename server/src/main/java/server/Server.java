@@ -4,6 +4,7 @@ package server;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Vector;
 
@@ -12,9 +13,21 @@ public class Server {
     private List<ClientHandler> clients;
     private AuthService authService;
 
-    public Server() {
+
+    public Server()  {
         clients = new Vector<>();
-        authService = new SimpleAuthService();
+
+        try {
+            if (!DataBase.connect()){
+                System.out.println("Не удалось подключиться к БД");
+            }
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        authService = new DBAuthServise();
         ServerSocket server = null;
         Socket socket;
 
@@ -33,6 +46,7 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
+            DataBase.disconnect();
             try {
                 server.close();
             } catch (IOException e) {
@@ -42,6 +56,9 @@ public class Server {
     }
 
     public void broadcastMsg(String nick, String msg) {
+
+        DataBase.addMessage(nick,"null", msg);
+
         for (ClientHandler c : clients) {
             c.sendMsg(nick + ": " + msg);
         }
@@ -54,6 +71,7 @@ public class Server {
         for (ClientHandler c : clients) {
             if (c.getNick().equals(receiver)) {
                 c.sendMsg(message);
+                DataBase.addMessage(sender.getNick(), receiver, msg);
                 if (!sender.getNick().equals(receiver)) {
                     sender.sendMsg(message);
                 }
@@ -88,7 +106,7 @@ public class Server {
         return false;
     }
 
-    private void broadcastClientList() {
+    void broadcastClientList() {
         StringBuilder sb = new StringBuilder("/clientlist ");
 
         for (ClientHandler c : clients) {
