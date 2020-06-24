@@ -139,7 +139,7 @@ public class Controller implements Initializable {
                                 });
                             }
 
-                            if (str.startsWith("/ваш ник: ")){
+                            if (str.startsWith("/yournick: ")){
                                 nick = str.split(" ") [1];
                                 setTitle(nick);
                             }

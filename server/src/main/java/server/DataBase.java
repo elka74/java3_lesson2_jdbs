@@ -15,7 +15,7 @@ public class DataBase {
         try {
 
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:maind.db");
+            connection = DriverManager.getConnection("jdbc:sqlite:main.db");
             prepareAllStatement();
             return true;
         } catch (SQLException | ClassNotFoundException e) {
@@ -27,9 +27,9 @@ public class DataBase {
     private static void prepareAllStatement() throws SQLException {
 
         stmGetNick = connection.prepareStatement("SELECT nick FROM users WHERE login = ? AND password = ?");
-        stmRegistration = connection.prepareStatement("INSERT INTO users (login, password, nick) VALUE (?, ?, ?);");
+        stmRegistration = connection.prepareStatement("INSERT INTO users (login, password, nick) VALUES (?, ?, ?)");
         stmChange = connection.prepareStatement("UPDATE users SET nick = ? WHERE nick = ?;");
-        stmAdd = connection.prepareStatement("INSERT INTO messags (sender, recipient, message) VALUES ((SELECT id FROM users WHERE nick), (SELECT id FROM users WHERE nick), ?);");
+        stmAdd = connection.prepareStatement("INSERT INTO messags (sender, recipient, message) VALUES ((SELECT id FROM users WHERE nick = ?), (SELECT id FROM users WHERE nick = ?), ?);");
         stmMesNick = connection.prepareStatement("SELECT (SELECT nick FROM users WHERE id = sender), (SELECT nick FROM users WHERE id = recipient), message\n" +
                 "FROM messags WHERE sender = (SELECT id FROM users WHERE nick = ?) OR recipient =(SELECT id FROM users WHERE nick = ?) OR recipient =(SELECT id FROM users WHERE nick = 'null');");
     }
@@ -63,7 +63,7 @@ public class DataBase {
                     bil.append(String.format("[%s] private [%s] : %s\n", sender, recipient, message));
                 }
             }
-            rs.close();
+            //rs.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

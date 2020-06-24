@@ -17,15 +17,17 @@ public class Server {
     public Server()  {
         clients = new Vector<>();
 
+
         try {
-            if (!DataBase.connect()){
-                System.out.println("Не удалось подключиться к БД");
+            if (!DataBase.connect()) {
+                throw new RuntimeException("Не удалось подключиться к БД");
             }
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
 
         authService = new DBAuthServise();
         ServerSocket server = null;
@@ -64,22 +66,22 @@ public class Server {
         }
     }
 
-    public void privateMsg(ClientHandler sender, String receiver, String msg) {
+    public void privateMsg(ClientHandler sender, String recipient, String msg) {
         String message = String.format("[ %s ] private [ %s ] : %s",
-                sender.getNick(), receiver, msg);
+                sender.getNick(), recipient, msg);
 
         for (ClientHandler c : clients) {
-            if (c.getNick().equals(receiver)) {
+            if (c.getNick().equals(recipient)) {
                 c.sendMsg(message);
-                DataBase.addMessage(sender.getNick(), receiver, msg);
-                if (!sender.getNick().equals(receiver)) {
+                DataBase.addMessage(sender.getNick(), recipient, msg);
+                if (!sender.getNick().equals(recipient)) {
                     sender.sendMsg(message);
                 }
                 return;
             }
         }
 
-        sender.sendMsg("not found user: " + receiver);
+        sender.sendMsg("not found user: " + recipient);
     }
 
 

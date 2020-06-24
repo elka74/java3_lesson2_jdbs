@@ -56,8 +56,7 @@ public class ClientHandler {
                                 continue;
                             }
 
-                            String newNick = server.getAuthService()
-                                    .getNicknameByLoginAndPassword(token[1], token[2]);
+                            String newNick = server.getAuthService().getNicknameByLoginAndPassword(token[1], token[2]);
 
                             login = token[1];
 
@@ -68,7 +67,6 @@ public class ClientHandler {
                                     server.subscribe(this);
                                     System.out.println("Клиент: " + nick + " подключился"+ socket.getRemoteSocketAddress());
                                     socket.setSoTimeout(0);
-
                                     sendMsg(DataBase.getMessageFromNick(nick));
                                     break;
                                 } else {
@@ -108,7 +106,7 @@ public class ClientHandler {
                                     continue;
                                 }
                                 if (server.getAuthService().changeNick(this.nick, token[1])){
-                                    sendMsg("/ваш ник: " + token[1]);
+                                    sendMsg("/yournick: " + token[1]);
                                     server.broadcastClientList();
                                 }else {
                                     sendMsg("Не удалось сменить ник.");
