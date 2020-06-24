@@ -19,11 +19,10 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.Socket;
 import java.net.URL;
+import java.nio.CharBuffer;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
@@ -53,7 +52,7 @@ public class Controller implements Initializable {
 
     private boolean authenticated;
     private String nick;
-
+    private String login;
     public void setAuthenticated(boolean authenticated) {
         this.authenticated = authenticated;
         authPanel.setVisible(!authenticated);
@@ -114,10 +113,14 @@ public class Controller implements Initializable {
                         if (str.startsWith("/authok ")) {
                             nick = str.split(" ")[1];
                             setAuthenticated(true);
+                            File fl = new File("client/history_" + nick  + ".txt");
+                                fl.createNewFile();
+
                             break;
                         }
 
                         textArea.appendText(str + "\n");
+
                     }
 
                     //цикл работы
@@ -145,7 +148,16 @@ public class Controller implements Initializable {
                             }
 
                         } else {
+
                             textArea.appendText(str + "\n");
+                           /* InputStreamReader ims = new InputStreamReader(new FileInputStream("client/history_" + nick  + ".txt"));
+                            int x;
+                            if ((x = ims.read()) != -1){
+                                ims.read(CharBuffer.wrap(str));
+                            }*/
+                            DataOutputStream dataOutput = new DataOutputStream(new FileOutputStream("client/history_" + nick  + ".txt"));
+                            dataOutput.writeUTF(str);
+                           dataOutput.close();
                         }
                     }
                 }catch (RuntimeException e){
@@ -167,11 +179,13 @@ public class Controller implements Initializable {
         }
     }
 
+
     public void sendMsg() {
         try {
             out.writeUTF(textField.getText());
             textField.clear();
             textField.requestFocus();
+
         } catch (IOException e) {
             e.printStackTrace();
         }

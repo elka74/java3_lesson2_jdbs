@@ -151,7 +151,7 @@ public class ClientHandler {
         return nick;
     }
 
-    public String getLogin() {
+    public  String getLogin() {
         return login;
     }
 }
