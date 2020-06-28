@@ -63,6 +63,7 @@ public class Controller implements Initializable {
         clientList.setManaged(authenticated);
         if (!authenticated) {
             nick = "";
+            FileClass.stopFile();
         }
         textArea.clear();
         setTitle(nick);
@@ -113,8 +114,10 @@ public class Controller implements Initializable {
                         if (str.startsWith("/authok ")) {
                             nick = str.split(" ")[1];
                             setAuthenticated(true);
-                            File fl = new File("client/history_" + nick  + ".txt");
-                                fl.createNewFile();
+
+                            //textArea.appendText(FileClass.lastLine(login));
+
+                            //FileClass.createFile(login);
 
                             break;
                         }
@@ -150,14 +153,8 @@ public class Controller implements Initializable {
                         } else {
 
                             textArea.appendText(str + "\n");
-                           /* InputStreamReader ims = new InputStreamReader(new FileInputStream("client/history_" + nick  + ".txt"));
-                            int x;
-                            if ((x = ims.read()) != -1){
-                                ims.read(CharBuffer.wrap(str));
-                            }*/
-                            DataOutputStream dataOutput = new DataOutputStream(new FileOutputStream("client/history_" + nick  + ".txt"));
-                            dataOutput.writeUTF(str);
-                           dataOutput.close();
+                            //FileClass.line(str);
+
                         }
                     }
                 }catch (RuntimeException e){
@@ -198,6 +195,7 @@ public class Controller implements Initializable {
 
         try {
             out.writeUTF("/auth " + loginField.getText().trim() + " " + passwordField.getText().trim());
+            //login = loginField.getText();
             passwordField.clear();
         } catch (IOException e) {
             e.printStackTrace();
